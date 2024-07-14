@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @EnableWebSecurity
 @Configuration
@@ -20,7 +21,8 @@ public class SecurityConfig {
         http
 
                 .authorizeHttpRequests((auth) ->auth
-                        .requestMatchers("home","/login","/loginProc","/save","/saveProc","/login?error", "/css/**", "/js/**","/list").permitAll()
+                        .requestMatchers("home","/login","/loginProc","/save","/saveProc","/login?error", "/css/**", "/js/**","/list","/board/**","/board/list","/boardlist","/boardmodify","/board/modify/**",
+                                "/board/view","/message","/boardview","/board/file/**","/board/update","/board/writepro","/boardwrite").permitAll()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
     //                    .requestMatchers("/my/**").hasAnyRole("ADMIN","USER")
                         .anyRequest().authenticated()
@@ -29,17 +31,17 @@ public class SecurityConfig {
         http
                 .formLogin((auth) -> auth.loginPage("/login")
                         .loginProcessingUrl("/loginProc")
-                        .defaultSuccessUrl("/home", true) // 로그인 성공 시 리다이렉트할 URL 설정
+                        .defaultSuccessUrl("/", true) // 로그인 성공 시 리다이렉트할 URL 설정
                         .failureUrl("/login?error")
                         .permitAll()
                 );
         http
-                .csrf((auth -> auth.disable()));
+                .csrf((AbstractHttpConfigurer::disable));
 
 
         http
                 .sessionManagement((auth) -> auth //다중 접속 세션
-                        .maximumSessions(4)
+                        .maximumSessions(100)
                         .maxSessionsPreventsLogin(false));
 
         http
@@ -50,6 +52,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/home")
                         .permitAll()
                 );
+        http
+                .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
